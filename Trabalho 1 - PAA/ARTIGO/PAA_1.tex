@@ -1,0 +1,150 @@
+\documentclass{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{algorithm, algorithmic}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{authblk}
+\usepackage{listings}
+\usepackage{float}
+
+\title{Identifica\c{c}\~ao de Pontes em Grafos e Caminho Euleriano}
+\author{
+    Ana Fernanda Souza Cancado \|\texttt{ anafcancado8@gmail.com} \and
+    Arthur de S\'a Braz de Matos \|\texttt{ arthursbmatos9@gmail.com} \and
+    Gabriel Praes Bernardes Nunes \|\texttt{ gabriel.praes@gmail.com} \and
+    Guilherme Ot\'avio de Oliveira \|\texttt{ gooliveira@sga.pucminas.br} \and
+    J\'ulia Pinheiro Roque \|\texttt{ juliapinheiroroque960@gmail.com}
+}
+\affil{PUC Minas}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\renewcommand{\abstractname}{Resumo}
+\begin{abstract}
+Este relatório descreve a implementação e análise de dois algoritmos para identificação de pontes em grafos: o método Naive \cite{SHARIR198167} baseado em testes de conectividade e o algoritmo de Tarjan \cite{doi:10.1137/0201010}. Além disso, implementamos o Algoritmo de Fleury \cite{10.5555/1051910} para encontrar um caminho euleriano em um grafo euleriano. Os tempos computacionais das abordagens foram comparados para grafos de diferentes tamanhos.
+\end{abstract}
+
+\section{Introdução}
+ Neste trabalho, é abordado o problema da identificação de pontes e a aplicação do Algoritmo de Fleury para encontrar caminhos e ciclos eulerianos. 
+
+Uma ponte é uma aresta que, se removida, aumenta o número de componentes conexos do grafo. Identificar pontes é importante em várias aplicações práticas, um exemplo, é no contexto de redes de computadores, em que ao indetificar essa aresta que faria parte da rede ficar desconectada, é possível buscar maneiras de minimizar o impacto de falhas.
+
+O Algoritmo de Fleury é utilizado para encontrar caminhos ou ciclos eulerianos. Um caminho euleriano percorre todas as arestas do grafo uma única vez sem repetir nenhuma aresta. Para ele existir, é necessário que o grafo seja conexo e tenha todos os vértices com grau par ou exatamente 2 de grau ímpar. Já um ciclo euleriano é um caminho euleriano que começa e termina no mesmo vértice, sem repetir aresta. Para isso, o grafo precisa ser conexo e todos os vértices precisam ter grau par. 
+
+A presença de uma ponte pode afetar o encontro de um caminho euleriano, já que se ela for removida, o grafo se tornará desconexo, o que impossibilita a existência de um caminho euleriano. Por isso, o algoritmo de Fleury evita a remoção dessas arestas.
+
+\section{Metodologia}
+
+\subsection{Identifica\c{c}\~ao de Pontes}
+Foram implementados dois m\'etodos para identifica\c{c}\~ao de pontes:
+
+\begin{itemize}
+    \item \textbf{Método Naive}: Remove-se cada aresta e testa-se a conectividade do grafo.
+    \begin{itemize}
+        \item \texttt{isConnected()} - percorre os vértices e realiza uma busca em profundidade (DFS), marcando os vértices visitados. Se algum vértice com vizinhos não for visitado, a função retorna \texttt{false}. Caso contrário, o grafo é considerado conexo e retorna \texttt{true}.
+        \item \texttt{isBridgeNaive(int u, int v)} - remove temporariamente a aresta \((u, v)\) e verifica a conectividade.
+        \item \texttt{findBridgesNaive()} - encontra todas as pontes no grafo. Para isso, percorre todas as arestas e utiliza \texttt{isBridgeNaive()} para identificar as pontes. As pontes encontradas são armazenadas em um vetor e retornadas ao final.
+    \end{itemize}
+    \item \textbf{Algoritmo de Tarjan}: Baseado em DFS e \textit{low-link values}.
+ \begin{itemize}
+    \item \texttt{bridgeUtil()} - Realiza a busca em profundidade (DFS) e é responsável por calcular os valores \texttt{disc} e \texttt{low} para cada vértice. 
+    \begin{itemize}
+        \item \texttt{disc[u]}: Representa o tempo de descoberta do vértice \(u\).
+        \item \texttt{low[u]}: Representa o menor tempo de descoberta alcançável a partir do vértice \(u\).
+    \end{itemize}
+    O algoritmo percorre os vértices adjacentes \(v\) de \(u\):
+    \begin{itemize}
+        \item Se \(v\) não foi visitado, o algoritmo realiza uma chamada recursiva para \(v\) e, após isso, atualiza \texttt{low[u]} com o valor mínimo entre \texttt{low[u]} e \texttt{low[v]}.
+        \item Se \texttt{low[v]} for maior que \texttt{disc[u]}, então a aresta \((u, v)\) é uma ponte, pois não há outro caminho para \(v\) que não passe pela aresta \((u, v)\).
+        \item Se \(v\) já foi visitado e não é o pai de \(u\), então o algoritmo atualiza \texttt{low[u]} com o menor valor entre \texttt{low[u]} e \texttt{disc[v]}.
+    \end{itemize}
+    \item \texttt{findBridgesTarjan()} - Inicializa as estruturas necessárias e executa \texttt{bridgeUtil()}.
+\end{itemize}
+
+\end{itemize}
+
+\subsection{An\'alise de Complexidade}
+%A complexidade do método Naíve é \(O(V \times E)\), onde \(V\) é o número de vértices e \(E\) o número de arestas. Isso ocorre porque a função \texttt{isConnected()} realiza uma busca em profundidade para cada aresta, o que resulta em uma complexidade elevada, especialmente para grafos grandes.
+
+A abordagem Naive para encontrar pontes em um grafo percorre todas as arestas e, para cada uma, verifica se sua remoção desconecta o grafo. Isso é feito removendo a aresta, verificando a conectividade com uma busca em profundidade (DFS) e, em seguida, restaurando a aresta.
+A complexidade dessa solução é \( O(V \times E(V + E)) \), pois para cada uma das \( E \) arestas, executamos uma verificação de conectividade que custa \( O(V + E) \).
+
+O algoritmo de Tarjan para encontrar \textit{pontes} em um grafo não direcionado utiliza uma busca em profundidade (DFS) modificada para calcular os menores tempos de descoberta acessíveis para cada vértice. A complexidade do algoritmo é \( O(V + E) \), pois cada vértice e aresta é visitado no máximo duas vezes. Isso torna o método eficiente, mesmo para grafos grandes e esparsos.
+
+\subsection{Caminho Euleriano}
+
+A presença de um Caminho Euleriano pode influenciar significativamente a identificação de pontes em um grafo. Em grafos com Ciclo Euleriano, onde não existem pontes, os algoritmos de identificação de pontes retornam um conjunto vazio.
+
+O algoritmo de Fleury é um método para encontrar um Caminho Euleriano em um grafo, garantindo que cada aresta seja percorrida apenas uma vez. A implementação do método \texttt{Graph::fleury} realiza os seguintes passos:
+
+\textbf{1. Verifica se existe um Caminho Euleriano:} Percorre os vértices e conta quantos possuem grau ímpar. Se existirem mais de dois, o grafo não possui Caminho Euleriano, e é retornado um caminho vazio.
+
+\textbf{2. Cria uma Cópia do Grafo:} Para não modificar o grafo original, ele é copiado.
+
+\textbf{3. Determina o Vértice de Início:} Se existir vértices de grau ímpar, o caminho inicia em um deles.
+
+\textbf{4. Percorre as Arestas Evitando Pontes:} Se existirem várias opções, ele evita escolher uma ponte para que o grafo não se desconecte antes da conclusão do percurso (pode ser feito utilizando o método Naive ou o de Tarjan).
+
+\textbf{5. Remove a Aresta e Continua o Caminho:} A aresta escolhida é removida e avança para o próximo vértice até que todas as arestas tenham sido percorridas e o caminho tenha sido finalizado.
+
+
+\section{Experimentos e Resultados}
+Testamos os algoritmos em grafos aleat\'orios de tamanhos variados. A tabela abaixo apresenta os tempos m\'edios obtidos.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ccc}
+        \toprule
+        \textbf{Tamanho do Grafo} & \textbf{M\'etodo Naive (ms)} & \textbf{Tarjan (ms)} \\
+        \midrule
+        100 & 22 & 1 \\
+        1000 & 17367 & 101 \\
+        10000 & 1527808 & 1434 \\
+        100000 & indeterminado & indeterminado \\
+        \bottomrule
+    \end{tabular}
+    \caption{Tempos m\'edios de execu\c{c}\~ao.}
+    \label{tab:resultados}
+\end{table}
+
+Com base nos resultados obtidos em função do número de vértices do grafo, observa-se que, mesmo para grafos menores (100 vértices), o algoritmo de Tarjan já apresenta uma vantagem significativa em termos de tempo de execução.
+Como ilustrado na Tabela 1, para um grafo com 100 vértices, o método Naíve leva 22 ms para concluir a execução, enquanto o algoritmo de Tarjan executa em apenas 1 ms. Essa diferença se torna ainda mais expressiva quando aumentamos consideravelmente a quantidade de vértices do grafo testado. Podemos verificar esse comportamento analisando a razão entre os tempos de execução medidos. Para 1.000 vértices, a relação entre os tempos dos dois algoritmos é aproximadamente:
+
+\[
+\frac {17367}{101} \approx 172
+\]
+
+
+Esse fator de crescimento confirma a expectativa teórica baseada na ordem de complexidade dos algoritmos. Enquanto o algoritmo de Tarjan possui complexidade O(V+E), garantindo um crescimento próximo ao linear, o método Naíve apresenta complexidade O(V×(V+E)), o que leva a um crescimento quadrático no pior caso.
+
+À medida que o número de vértices aumenta, esse comportamento se torna ainda mais evidente. Para 10.000, o aumento é de 8697,19%, em uma execução que ultrapassa 15 minutos. Para 100.000 vértices, foi impossível reproduzir o tempo de execução. O algoritmo de Tarjan, por outro lado, mantém um tempo de execução viável para 10.000 vértices (10,7 segundos), mas também se torna inviável para 100.000 vértices. Isso sugere que, para problemas em larga escala, mesmo algoritmos otimizados podem necessitar de abordagens ainda mais eficientes, como paralelização ou heurísticas especializadas. 
+
+Para 100.000 vértices, o método Naíve torna-se impraticável, com tempo de execução indeterminados devido à escalabilidade inadequada. O algoritmo de Tarjan, por outro lado, mantém um tempo de execução viável para 10.000 vértices (1,4 segundos), mas também se torna inviável para 100.000 vértices. Isso sugere que, para problemas em larga escala, mesmo algoritmos otimizados podem necessitar de abordagens ainda mais eficientes, como paralelização ou heurísticas especializadas.
+
+Esses resultados demonstram a superioridade do algoritmo de Tarjan para a identificação de pontes em grafos, especialmente em cenários com um grande número de vértices e arestas, onde a eficiência do método se torna um fator crítico para a viabilidade da análise.
+
+\section{Conclus\~ao}
+Os experimentos demonstram a superioridade do algoritmo de Tarjan em relação ao Naive para a identificação de pontes e do algoritmo de Fleury. Através dos testes em grafos de diferentes tamanhos, o método Naive torna-se impraticável para grafos com um grande número de vértices. O algoritmo de Tarjan manteve tempos de execução viáveis até grafos com 10.000 vértices, embora também tenha se tornado inviável para grafos ainda maiores.
+
+A Tabela 1 evidencia essa diferença de desempenho, mostrando que, para 100 vértices, o algoritmo de Tarjan já é significativamente melhor que o Naive, sendo aproximadamente 22 vezes mais rápido. Essa vantagem cresce exponencialmente à medida que o número de vértices aumenta, devido a diferença de complexidades dos métodos: enquanto Tarjan é de $O(V + E)$, o Naive tem complexidade $O(V \times (V + E))$.
+
+O algoritmo de Tarjan manteve um desempenho aceitável, executando em 1,4 segundos para 10.000 vértices, mas também se tornou inviável para 100.000 vértices. Dessa forma, concluímos que o algoritmo de Tarjan é a melhor escolha para a execução do algoritmo de Fleury em grafos de médio porte, garantindo um tempo de execução significativamente menor em comparação ao método Naive.
+
+\section*{Responsabilidades da Equipe}
+\begin{itemize}
+    \item Ana Fernanda: Implementação do método Naive.
+    \item Arthur: Implementação do algoritmo de Tarjan.
+    \item Gabriel: Implementação do Algoritmo de Fleury.
+    \item Guilherme, Júlia e Ana Fernanda: Escrita do relatório.
+    \item Guilherme e Júlia: Análise de complexidade e análise dos resultados.
+\end{itemize}
+
+\bibliographystyle{plain}
+\bibliography{referencias}
+\end{document}
+
