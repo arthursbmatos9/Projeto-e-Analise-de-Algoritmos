@@ -189,7 +189,6 @@ void ZhangShashaCalculator<T>::calcularKeyroots() {
 
 template <typename T>
 double ZhangShashaCalculator<T>::calcularDistanciaSubarvore(int i, int j) {
-    
     int l_i = leftmost_arvore1[i];
     int l_j = leftmost_arvore2[j];
     
@@ -216,29 +215,27 @@ double ZhangShashaCalculator<T>::calcularDistanciaSubarvore(int i, int j) {
             int row = i1 - l_i + 1;
             int col = j1 - l_j + 1;
             
-            if (leftmost_arvore1[i1] == leftmost_arvore1[i] && leftmost_arvore2[j1] == leftmost_arvore2[j]) {
-                // CASO ESPECIAL: mapeamento direto
+            if (leftmost_arvore1[i1] == l_i && leftmost_arvore2[j1] == l_j) {
+                // Caso: ambos os nós têm leftmost igual aos da subárvore atual
                 int custo_del = forestdist[row - 1][col] + 
-                                  custoDeletar(nos_arvore1[i1]);
+                                custoDeletar(nos_arvore1[i1]);
                 int custo_ins = forestdist[row][col - 1] + 
-                                  custoInserir(nos_arvore2[j1]);
+                                custoInserir(nos_arvore2[j1]);
                 int custo_sub = forestdist[row - 1][col - 1] + 
-                                  custoSubstituir(nos_arvore1[i1], 
-                                                nos_arvore2[j1]);
+                                custoSubstituir(nos_arvore1[i1], nos_arvore2[j1]);
                 
                 forestdist[row][col] = min({custo_del, custo_ins, custo_sub});
-                treedist[i1][j1] = forestdist[row][col]; // Salvar resultado
+                treedist[i1][j1] = forestdist[row][col];
             } else {
-                // CASO GERAL: usar treedist já calculada
+                // Caso geral: usar resultado já calculado
                 int custo_del = forestdist[row - 1][col] + 
-                                  custoDeletar(nos_arvore1[i1]);
+                                custoDeletar(nos_arvore1[i1]);
                 int custo_ins = forestdist[row][col - 1] + 
-                                  custoInserir(nos_arvore2[j1]);
+                                custoInserir(nos_arvore2[j1]);
                 
-                // Usar a distância já calculada entre as subárvores
-                int l_i1 = leftmost_arvore1[i1];
-                int l_j1 = leftmost_arvore2[j1];
-                int custo_tree = forestdist[l_i1 - l_i][l_j1 - l_j] + treedist[i1][j1];
+                // Usar a distância entre subárvores já calculada
+                int custo_tree = forestdist[leftmost_arvore1[i1] - l_i][leftmost_arvore2[j1] - l_j] + 
+                                treedist[i1][j1];
                 
                 forestdist[row][col] = min({custo_del, custo_ins, custo_tree});
             }
