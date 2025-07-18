@@ -1,7 +1,7 @@
 @echo off
 
-echo Compilando e executando Tai_algorithm...
-g++ Tai_algorithm\main.cpp -I Tai_algorithm\include -o tai_exec.exe
+echo Compilando e executando distancia_edicao...
+g++ distancia_edicao\main.cpp -I distancia_edicao\include -o tai_exec.exe
 tai_exec.exe
 
 echo -----------------------------------------------------------------------

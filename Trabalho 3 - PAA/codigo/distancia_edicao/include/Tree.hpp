@@ -40,7 +40,7 @@ Tree<T>::Tree(const T& labelRaiz) : raiz(make_shared<No<T>>(labelRaiz)) {}
 
 template <typename T>
 shared_ptr<No<T>> Tree<T>::getRaiz() {
-    return this.raiz;
+    return this->raiz;
 }
 
 template <typename T>
